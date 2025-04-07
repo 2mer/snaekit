@@ -1,0 +1,22 @@
+{
+	"name": "@snaekit/core",
+	"version": "1.0.0",
+	"description": "",
+	"main": "dist/index.js",
+	"module": "dist/index.mjs",
+	"types": "dist/index.d.ts",
+	"scripts": {
+		"build": "tsup"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"tsup": "^8.4.0",
+		"typescript": "~5.7.2"
+	},
+	"dependencies": {
+		"@sgty/point": "^1.0.3",
+		"@snaekit/ecs": "workspace:^"
+	}
+}

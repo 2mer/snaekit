@@ -1,0 +1,16 @@
+{
+	"linter": {
+		"rules": {
+			"complexity": {
+				"noForEach": "off",
+				"noBannedTypes": "off"
+			},
+			"suspicious": {
+				"noExplicitAny": "off"
+			},
+			"style": {
+				"noNonNullAssertion": "off"
+			}
+		}
+	}
+}
