@@ -1,5 +1,6 @@
+import type { ComponentClass } from "./Component";
 import type { ECS } from "./ECS";
-import type { EntityId } from "./Entity";
+import type { Entity } from "./Entity";
 
 export abstract class System {
 	/**
@@ -8,12 +9,13 @@ export abstract class System {
 	 *
 	 * This should be defined at compile time and should never change.
 	 */
-	public abstract componentsRequired: Set<Function>;
+	public abstract componentsRequired: Set<ComponentClass>;
 
-	/**
-	 * update() is called on the System every frame.
-	 */
-	public abstract update(entities: Set<EntityId>): void;
+	public update() {}
+
+	public onEntityAdded(entity: Entity) {}
+
+	public onEntityRemoved(entity: Entity) {}
 
 	/**
 	 * The ECS is given to all Systems. Systems contain most of the game

@@ -10,6 +10,15 @@ importers:
 
   apps/snake:
     dependencies:
+      '@sgty/point':
+        specifier: ^1.0.3
+        version: 1.0.3
+      '@snaekit/core':
+        specifier: workspace:^
+        version: link:../../packages/core
+      '@snaekit/ecs':
+        specifier: workspace:^
+        version: link:../../packages/ecs
       react:
         specifier: ^19.0.0
         version: 19.1.0

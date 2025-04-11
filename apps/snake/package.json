@@ -10,6 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@sgty/point": "^1.0.3",
+    "@snaekit/core": "workspace:^",
+    "@snaekit/ecs": "workspace:^",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
