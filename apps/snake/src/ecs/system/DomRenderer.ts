@@ -1,9 +1,12 @@
 import { type ComponentClass, type Entity, System } from "@snaekit/ecs";
 import { DomRenderable } from "../component/DomRenderable";
-import { Position } from "../component/Position";
+import { Position2D } from "../component/util/Position2D";
 
 export class DomRenderer extends System {
-	componentsRequired: Set<ComponentClass> = new Set([DomRenderable, Position]);
+	componentsRequired: Set<ComponentClass> = new Set([
+		DomRenderable,
+		Position2D,
+	]);
 
 	constructor(public readonly root: HTMLElement) {
 		super();
@@ -14,7 +17,7 @@ export class DomRenderer extends System {
 
 		for (const entity of entities) {
 			const domRenderable = entity.$(DomRenderable);
-			const position$ = entity.$(Position);
+			const position$ = entity.$(Position2D);
 
 			domRenderable.element.style.setProperty(
 				"left",
@@ -29,7 +32,7 @@ export class DomRenderer extends System {
 
 	onEntityAdded(entity: Entity): void {
 		const domRenderable = entity.$(DomRenderable);
-		const position = entity.$(Position);
+		const position = entity.$(Position2D);
 
 		domRenderable.element.style.setProperty(
 			"left",

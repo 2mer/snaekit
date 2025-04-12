@@ -1,5 +1,6 @@
 export * from "./util/Direction";
 export * from "./data/Matrix";
+export * from "./data/WorldMap";
 export * from "./components/Collidable";
 export * from "./components/Edible";
 export * from "./components/Sensitive";

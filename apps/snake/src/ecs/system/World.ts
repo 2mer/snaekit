@@ -1,31 +1,30 @@
 import { type ComponentClass, type Entity, System } from "@snaekit/ecs";
 import { Position } from "../component/Position";
-import type { Matrix } from "@snaekit/core";
-import type { Point2D } from "@sgty/point";
+import type { WorldMap } from "@snaekit/core";
 
-export class World extends System {
+export class World<TPos> extends System {
 	componentsRequired: Set<ComponentClass> = new Set([Position]);
 
-	constructor(public readonly matrix: Matrix<Set<Entity>>) {
+	constructor(public readonly worldMap: WorldMap<TPos, Set<Entity>>) {
 		super();
 	}
 
 	onEntityAdded(entity: Entity): void {
-		const pos = entity.$(Position);
-		const cell = this.matrix.get(pos.position) ?? new Set<Entity>();
+		const pos = entity.$(Position<TPos>);
+		const cell = this.worldMap.get(pos.position) ?? new Set<Entity>();
 
 		cell.add(entity);
 
-		this.matrix.set(pos.position, cell);
+		this.worldMap.set(pos.position, cell);
 	}
 
 	onEntityRemoved(entity: Entity): void {
-		const pos = entity.$(Position);
-		const cell = this.matrix.get(pos.position);
+		const pos = entity.$(Position<TPos>);
+		const cell = this.worldMap.get(pos.position);
 
 		cell.delete(entity);
 
-		this.matrix.set(pos.position, cell);
+		this.worldMap.set(pos.position, cell);
 	}
 
 	updateEntity(entity: Entity, updateFn: () => void): void {
@@ -36,7 +35,7 @@ export class World extends System {
 		this.onEntityAdded(entity);
 	}
 
-	getEntitiesAt(position: Point2D) {
-		return this.matrix.get(position);
+	getEntitiesAt(position: TPos) {
+		return this.worldMap.get(position);
 	}
 }

@@ -1,19 +1,14 @@
 import type { Point2D } from "@sgty/point";
+import { WorldMap } from "./WorldMap";
 
-export abstract class AbstractMatrix<T> {
+export class Matrix<T> extends WorldMap<Point2D, T> {
+	private values: T[][];
+
 	constructor(
 		public readonly width: number,
 		public readonly height: number = width,
-	) {}
-
-	abstract get(position: Point2D): T;
-}
-
-export class Matrix<T> extends AbstractMatrix<T> {
-	private values: T[][];
-
-	constructor(width: number, height: number = width) {
-		super(width, height);
+	) {
+		super();
 
 		this.values = Array.from({ length: height }, (_, i) =>
 			Array.from({ length: width }),
@@ -21,10 +16,19 @@ export class Matrix<T> extends AbstractMatrix<T> {
 	}
 
 	get(position: Point2D): T {
-		return this.values[position.y][position.x];
+		return this.values?.[position.y]?.[position.x];
 	}
 
 	set(position: Point2D, value: T): void {
 		this.values[position.y][position.x] = value;
+	}
+
+	has(position: Point2D) {
+		if (position.x < 0) return false;
+		if (position.y < 0) return false;
+		if (position.x >= this.width) return false;
+		if (position.y >= this.height) return false;
+
+		return true;
 	}
 }

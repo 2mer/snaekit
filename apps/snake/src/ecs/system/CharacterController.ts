@@ -1,11 +1,15 @@
 import { type ComponentClass, type Entity, System } from "@snaekit/ecs";
 import { Snake } from "../component/Snake";
-import { Moving } from "../component/Moving";
 import type { Point2D } from "@sgty/point";
+import type { Movement } from "./Movement";
 
 export class CharacterController extends System {
-	componentsRequired: Set<ComponentClass> = new Set([Snake, Moving]);
+	componentsRequired: Set<ComponentClass> = new Set([Snake]);
 	character: Entity | undefined = undefined;
+
+	constructor(public movement: Movement) {
+		super();
+	}
 
 	onEntityAdded(entity: Entity): void {
 		this.character = entity;
@@ -16,7 +20,8 @@ export class CharacterController extends System {
 	}
 
 	setMoveDirection(direction: Point2D) {
-		const moving = this.character!.$(Moving);
-		moving.direction = direction;
+		const snake = this.character!.$(Snake);
+
+		snake.propagateMotion(this.movement, direction);
 	}
 }

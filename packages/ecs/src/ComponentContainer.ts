@@ -14,6 +14,7 @@ export class ComponentContainer {
 		for (const component of components) {
 			this.map.set(component.constructor, component);
 			component.entity = this.entity;
+			component.onAdded();
 		}
 		this.ecs.updateEntitySystems(this.entity);
 	}
@@ -36,6 +37,10 @@ export class ComponentContainer {
 	}
 
 	public delete(componentClass: ComponentClass): void {
-		this.map.delete(componentClass);
+		if (this.map.has(componentClass)) {
+			const entry = this.map.get(componentClass)!;
+			entry.onRemoved();
+			this.map.delete(componentClass);
+		}
 	}
 }
