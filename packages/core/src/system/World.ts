@@ -1,8 +1,9 @@
 import { type ComponentClass, type Entity, System } from "@snaekit/ecs";
 import { Position } from "../component/Position";
-import type { WorldMap } from "@snaekit/core";
+import type { WorldMap } from "../data/WorldMap";
+import type { GenericPoint } from "@sgty/point";
 
-export class World<TPos> extends System {
+export class World<TPos extends GenericPoint<TPos>> extends System {
 	componentsRequired: Set<ComponentClass> = new Set([Position]);
 
 	constructor(public readonly worldMap: WorldMap<TPos, Set<Entity>>) {

@@ -1,5 +1,5 @@
 {
-	"name": "@snaekit/core",
+	"name": "@snaekit/render-dom",
 	"version": "1.0.0",
 	"description": "",
 	"main": "dist/index.js",
@@ -12,11 +12,15 @@
 	"author": "",
 	"license": "ISC",
 	"devDependencies": {
+		"@sgty/point": "^1.0.8",
+		"@snaekit/core": "workspace:^",
+		"@snaekit/ecs": "workspace:^",
 		"tsup": "^8.4.0",
 		"typescript": "~5.7.2"
 	},
-	"dependencies": {
-		"@sgty/point": "^1.0.8",
+	"peerDependencies": {
+		"@sgty/point": "^1.0.5",
+		"@snaekit/core": "workspace:^",
 		"@snaekit/ecs": "workspace:^"
 	}
 }

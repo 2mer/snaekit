@@ -1,9 +1,11 @@
-export * from "./util/Direction";
 export * from "./data/Matrix";
 export * from "./data/WorldMap";
-export * from "./components/Collidable";
-export * from "./components/Edible";
-export * from "./components/Sensitive";
-export * from "./components/Slither";
-export * from "./components/Tickable";
-export * from "./components/Tile";
+
+export * from "./component/Collider";
+export * from "./component/Moving";
+export * from "./component/Position";
+export * from "./component/Snake";
+
+export * from "./system/CharacterController";
+export * from "./system/Movement";
+export * from "./system/World";

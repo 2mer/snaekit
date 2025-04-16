@@ -1,13 +1,13 @@
-import type { Point2D } from "@sgty/point";
+import type { GenericPoint } from "@sgty/point";
 import { Component, type Entity } from "@snaekit/ecs";
 
-export class Collider extends Component {
+export class Collider<T extends GenericPoint<T>> extends Component {
 	/**
 	 * @param onCollide code that will execute when colliding with a collider (before moving into it), returns whether the collider is solid
 	 */
 	constructor(
 		public options: {
-			onCollide?: (entity: Entity, direction: Point2D) => void;
+			onCollide?: (entity: Entity, direction: T) => void;
 			isSolid: (entity: Entity) => boolean;
 		},
 	) {

@@ -1,9 +1,9 @@
-import type { Point2D } from "@sgty/point";
+import type { GenericPoint } from "@sgty/point";
 import { Component, type Entity } from "@snaekit/ecs";
 import { Moving } from "./Moving";
 import type { Movement } from "../system/Movement";
 
-export class Snake extends Component {
+export class Snake<T extends GenericPoint<T>> extends Component {
 	parts: Array<Entity> = [];
 
 	onAdded(): void {
@@ -19,8 +19,8 @@ export class Snake extends Component {
 		return this.parts[this.parts.length - 1];
 	}
 
-	private shiftEntityDirection(entity: Entity, newDirection: Point2D) {
-		const moving = entity.$(Moving);
+	private shiftEntityDirection(entity: Entity, newDirection: T) {
+		const moving = entity.$(Moving<T>);
 		const prevDirection = moving.direction.clone();
 
 		moving.direction.set(newDirection);
@@ -28,7 +28,7 @@ export class Snake extends Component {
 		return prevDirection;
 	}
 
-	propagateMotion(movementSystem: Movement, direction: Point2D) {
+	propagateMotion(movementSystem: Movement<T>, direction: T) {
 		const collisions = movementSystem.getEntityCollisions(
 			this.entity,
 			direction,

@@ -3,27 +3,26 @@ import { Moving } from "../component/Moving";
 import { Position } from "../component/Position";
 import type { World } from "./World";
 import { Collider } from "../component/Collider";
-import type { Point2D } from "@sgty/point";
-import { Position2D } from "../component/util/Position2D";
+import type { GenericPoint } from "@sgty/point";
 
-export class Movement extends System {
+export class Movement<T extends GenericPoint<T>> extends System {
 	componentsRequired: Set<ComponentClass> = new Set([Moving, Position]);
 
-	constructor(public world: World<Point2D>) {
+	constructor(public world: World<T>) {
 		super();
 	}
 
 	public getEntityDirection(entity: Entity) {
-		const moving$ = entity.$(Moving);
+		const moving$ = entity.$(Moving<T>);
 
 		return moving$.direction;
 	}
 
 	public getEntityCollisions(
 		entity: Entity,
-		direction: Point2D = this.getEntityDirection(entity),
+		direction: T = this.getEntityDirection(entity),
 	) {
-		const position$ = entity.$(Position2D);
+		const position$ = entity.$(Position<T>);
 
 		const wishPos = position$.position.clone().add(direction);
 
@@ -43,8 +42,8 @@ export class Movement extends System {
 
 	public handleEntityCollisions(
 		entity: Entity,
-		direction: Point2D,
-		collisions: Collider[],
+		direction: T,
+		collisions: Collider<T>[],
 	) {
 		collisions.forEach((collider) => {
 			collider.options.onCollide?.(entity, direction);
@@ -55,14 +54,12 @@ export class Movement extends System {
 		const entities = this.ecs.getSystemEntities(this)!;
 
 		for (const entity of entities) {
-			const moving$ = entity.$(Moving);
-			const position$ = entity.$(Position2D);
+			const moving$ = entity.$(Moving<T>);
+			const position$ = entity.$(Position<T>);
 
 			if (!moving$.enabled) {
 				continue;
 			}
-
-			let wishPos = position$.position.clone().add(moving$.direction);
 
 			const collisions = this.getEntityCollisions(entity, moving$.direction);
 			const canMove = this.canEntityMove(entity, collisions);
@@ -79,7 +76,7 @@ export class Movement extends System {
 				continue;
 			}
 
-			wishPos = position$.position.clone().add(moving$.direction);
+			const wishPos = position$.position.clone().add(moving$.direction);
 
 			// update the matrix
 			this.world.updateEntity(entity, () => {
