@@ -1,8 +1,14 @@
 import type { ComponentClass } from "./Component";
 import type { ECS } from "./ECS";
+import type { Effect } from "./Effects";
 import type { Entity } from "./Entity";
+import { EntityEffects } from "./EntityEffects";
+
+export type SystemClass = new (...args: any) => System;
 
 export abstract class System {
+	public entities = new Set<Entity>();
+	private entityEffects = new EntityEffects();
 	/**
 	 * Set of Component classes, ALL of which are required before the
 	 * system is run on an entity.
@@ -11,11 +17,26 @@ export abstract class System {
 	 */
 	public abstract componentsRequired: Set<ComponentClass>;
 
-	public update() {}
+	public update() {
+		this.entityEffects.run();
+	}
 
-	public onEntityAdded(entity: Entity) {}
+	public onEntityAdded(entity: Entity) {
+		this.entityEffects.addEntity(entity);
+	}
 
-	public onEntityRemoved(entity: Entity) {}
+	public onEntityRemoved(entity: Entity) {
+		this.entityEffects.removeEntity(entity);
+	}
+
+	public useEffect(effectFn: Effect<Entity>, deps: ComponentClass[]) {
+		this.entityEffects.addEffect(effectFn, deps);
+	}
+
+	destroy() {
+		this.entities.clear();
+		this.entityEffects.destroy();
+	}
 
 	/**
 	 * The ECS is given to all Systems. Systems contain most of the game

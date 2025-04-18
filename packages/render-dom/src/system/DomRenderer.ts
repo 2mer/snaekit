@@ -10,45 +10,77 @@ export class DomRenderer extends System {
 
 	constructor(public readonly root: HTMLElement) {
 		super();
-	}
 
-	update() {
-		const entities = this.ecs.getSystemEntities(this)!;
-
-		for (const entity of entities) {
+		this.useEffect((entity) => {
 			const domRenderable = entity.$(DomRenderable);
-			const position$ = entity.$(Position2D);
+			console.log("in effect");
 
-			domRenderable.element.style.setProperty(
-				"left",
-				`calc(var(--cell-size) * ${position$.position.x})`,
-			);
-			domRenderable.element.style.setProperty(
-				"top",
-				`calc(var(--cell-size) * ${position$.position.y})`,
-			);
-		}
+			this.root.appendChild(domRenderable.element);
+
+			return () => {
+				console.log("cleanup!");
+				this.root.removeChild(domRenderable.element);
+			};
+		}, []);
+
+		this.useEffect(
+			(entity) => {
+				const domRenderable = entity.$(DomRenderable);
+				const position = entity.$(Position2D);
+
+				domRenderable.element.style.setProperty(
+					"left",
+					`calc(var(--cell-size) * ${position.position.x})`,
+				);
+				domRenderable.element.style.setProperty(
+					"top",
+					`calc(var(--cell-size) * ${position.position.y})`,
+				);
+			},
+			[Position2D],
+		);
 	}
 
 	onEntityAdded(entity: Entity): void {
-		const domRenderable = entity.$(DomRenderable);
-		const position = entity.$(Position2D);
-
-		domRenderable.element.style.setProperty(
-			"left",
-			`calc(var(--cell-size) * ${position.position.x})`,
-		);
-		domRenderable.element.style.setProperty(
-			"top",
-			`calc(var(--cell-size) * ${position.position.y})`,
-		);
-
-		this.root.appendChild(domRenderable.element);
+		super.onEntityAdded(entity);
+		console.log("entityadded!");
 	}
 
-	onEntityRemoved(entity: Entity): void {
-		const domRenderable = entity.$(DomRenderable);
+	// update() {
+	// 	for (const entity of this.entities) {
+	// 		const domRenderable = entity.$(DomRenderable);
+	// 		const position$ = entity.$(Position2D);
 
-		this.root.removeChild(domRenderable.element);
-	}
+	// 		domRenderable.element.style.setProperty(
+	// 			"left",
+	// 			`calc(var(--cell-size) * ${position$.position.x})`,
+	// 		);
+	// 		domRenderable.element.style.setProperty(
+	// 			"top",
+	// 			`calc(var(--cell-size) * ${position$.position.y})`,
+	// 		);
+	// 	}
+	// }
+
+	// onEntityAdded(entity: Entity): void {
+	// 	const domRenderable = entity.$(DomRenderable);
+	// 	const position = entity.$(Position2D);
+
+	// 	domRenderable.element.style.setProperty(
+	// 		"left",
+	// 		`calc(var(--cell-size) * ${position.position.x})`,
+	// 	);
+	// 	domRenderable.element.style.setProperty(
+	// 		"top",
+	// 		`calc(var(--cell-size) * ${position.position.y})`,
+	// 	);
+
+	// 	this.root.appendChild(domRenderable.element);
+	// }
+
+	// onEntityRemoved(entity: Entity): void {
+	// 	const domRenderable = entity.$(DomRenderable);
+
+	// 	this.root.removeChild(domRenderable.element);
+	// }
 }

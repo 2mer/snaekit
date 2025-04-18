@@ -8,11 +8,11 @@ export class ComponentContainer {
 		public ecs: ECS,
 	) {}
 
-	private map = new Map<Function, Component>();
+	private map = new Map<ComponentClass, Component>();
 
 	public add(...components: Component[]): void {
 		for (const component of components) {
-			this.map.set(component.constructor, component);
+			this.map.set(component.constructor as ComponentClass, component);
 			component.entity = this.entity;
 			component.onAdded();
 		}

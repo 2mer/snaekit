@@ -1,16 +1,19 @@
 import { useEffect, useRef } from "react";
 // import { Direction, Matrix, Tile } from "@snaekit/core";
 import "./App.css";
-import { type Component, ECS } from "@snaekit/ecs";
+import { type Component, ECS, System } from "@snaekit/ecs";
 import { type Point2D, vec2 } from "@sgty/point";
 import {
 	CharacterController,
 	Collider,
+	Controlled,
 	Matrix,
 	Movement,
 	Moving,
 	Position,
+	Slither,
 	Snake,
+	WishDir,
 	World,
 } from "@snaekit/core";
 import { DomRenderable, DomRenderer, Position2D } from "@snaekit/render-dom";
@@ -62,9 +65,9 @@ function App() {
 
 					moving$.sleep = 1;
 
-					world.updateEntity(entity, () => {
-						position$.position.set(newPos);
-					});
+					position$.position.set(newPos);
+					position$.onChanged();
+
 				},
 			}),
 		);
@@ -90,12 +93,14 @@ function App() {
 		);
 		const renderer = new DomRenderer(gameEl);
 		const movement = new Movement(world);
-		const controller = new CharacterController(movement);
+		const controller = new CharacterController();
+		const slither = new Slither();
 
 		ecs.addSystem(world);
-		ecs.addSystem(renderer);
-		ecs.addSystem(movement);
 		ecs.addSystem(controller);
+		ecs.addSystem(slither);
+		ecs.addSystem(movement);
+		ecs.addSystem(renderer);
 
 		function createTile(
 			position: Point2D,
@@ -117,67 +122,61 @@ function App() {
 		}
 
 		function createSnakePart(position?: Point2D) {
-			const part = createTile(
-				position ?? vec2(),
-				{
-					backgroundColor:
-						player.$(Snake).parts.length % 2 === 0 ? "orange" : "yellow",
-				},
+			const part = ecs.addEntity(
+				new Position2D(position ?? vec2()),
+				new DomRenderable().cls("tile").styled({ backgroundColor: "orange", zIndex: "10" }),
 				new Moving(vec2()),
-				new Collider({ isSolid: True }),
+				new Collider({
+					onCollide(entity) {
+						if (entity === player) {
+							alert("game over!");
+						}
+					},
+					isSolid(entity) {
+						return entity === player;
+					}
+				})
 			);
 
 			return part;
 		}
 
 		function update() {
-			movement.update();
-			renderer.update();
+			ecs.update(() => {
+				controller.update();
+				slither.update();
+				movement.update();
+				world.update();
+				renderer.update();
+			})
+		}
 
-			ecs.destoryPendingEntities();
+		function handleMoveInDirection(direction: Point2D) {
+			return () => {
+				controller.setMoveDirection(direction);
+				update();
+			}
 		}
 
 		const keyHandlers = {
-			a: () => {
-				controller.setMoveDirection(Direction.LEFT);
-				update();
-			},
-			s: () => {
-				controller.setMoveDirection(Direction.DOWN);
-				update();
-			},
-			d: () => {
-				controller.setMoveDirection(Direction.RIGHT);
-				update();
-			},
-			w: () => {
-				controller.setMoveDirection(Direction.UP);
-				update();
-			},
+			a: handleMoveInDirection(Direction.LEFT),
+			s: handleMoveInDirection(Direction.DOWN),
+			d: handleMoveInDirection(Direction.RIGHT),
+			w: handleMoveInDirection(Direction.UP),
 
-			ArrowLeft: () => {
-				controller.setMoveDirection(Direction.LEFT);
-				update();
-			},
-			ArrowDown: () => {
-				controller.setMoveDirection(Direction.DOWN);
-				update();
-			},
-			ArrowRight: () => {
-				controller.setMoveDirection(Direction.RIGHT);
-				update();
-			},
-			ArrowUp: () => {
-				controller.setMoveDirection(Direction.UP);
-				update();
-			},
+			ArrowLeft: handleMoveInDirection(Direction.LEFT),
+			ArrowDown: handleMoveInDirection(Direction.DOWN),
+			ArrowRight: handleMoveInDirection(Direction.RIGHT),
+			ArrowUp: handleMoveInDirection(Direction.UP),
 		} as Record<string, () => void>;
 
-		const player = createTile(
-			vec2(0, 0),
-			{ backgroundColor: "red", zIndex: "10" },
+		const player = ecs.addEntity(
+			new Position2D(vec2(0, 0)),
+			new DomRenderable().cls("tile").styled({ backgroundColor: "red", zIndex: "10" }),
 			new Moving(vec2()),
+			new WishDir(vec2()),
 			new Snake(),
+			new Controlled(),
 		);
 
 		// test wall
@@ -205,6 +204,7 @@ function App() {
 			{ backgroundColor: "green" },
 			new Collider({
 				onCollide(entity) {
+					console.log({ entity, player, same: entity === player })
 					if (entity === player) {
 						const snake = player.$(Snake);
 						const tail = snake.getTailEntity();
@@ -222,6 +222,9 @@ function App() {
 
 			handler?.();
 		});
+
+		world.update();
+		renderer.update();
 	}, []);
 
 	return (

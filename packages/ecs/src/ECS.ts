@@ -1,24 +1,23 @@
+import type { Component } from "./Component";
+import { Effects } from "./Effects";
 import { Entity, type EntityId } from "./Entity";
-import type { System } from "./System";
+import type { System, SystemClass } from "./System";
 import { v4 } from "uuid";
 
 export class ECS {
 	private entities = new Map<EntityId, Entity>();
-	private systems = new Map<System, Set<Entity>>();
+	private systems = new Map<SystemClass, System>();
+	public effects = new Effects();
 
-	private entitiesToDestroy = new Array<Entity>();
-
-	public addEntity(): Entity {
+	public addEntity(...components: Component[]): Entity {
 		const id = v4();
 		const entity = new Entity(id, this);
 
 		this.entities.set(id, entity);
 
-		return entity;
-	}
+		entity.components.add(...components);
 
-	public getSystemEntities(system: System) {
-		return this.systems.get(system);
+		return entity;
 	}
 
 	/**
@@ -28,7 +27,9 @@ export class ECS {
 	 * others not.
 	 */
 	public removeEntity(entity: Entity): void {
-		this.entitiesToDestroy.push(entity);
+		this.effects.queue(() => {
+			this.destroyEntity(entity);
+		});
 	}
 
 	public addSystem(system: System): void {
@@ -40,40 +41,36 @@ export class ECS {
 
 		system.ecs = this;
 
-		this.systems.set(system, new Set());
+		this.systems.set(system.constructor as SystemClass, system);
 
 		for (const entity of this.entities.values()) {
 			this.updateEntitySystem(entity, system);
 		}
 	}
 
+	public getSystem<T extends SystemClass>(system: T) {
+		return this.systems.get(system) as InstanceType<T> | undefined;
+	}
+
 	public removeSystem(system: System): void {
-		this.systems.delete(system);
+		this.systems.delete(system.constructor as SystemClass);
 	}
 
-	public update(): void {
-		for (const system of this.systems.keys()) {
-			system.update();
-		}
+	public update(logicFn: () => void): void {
+		logicFn();
 
-		this.destoryPendingEntities();
-	}
-
-	public destoryPendingEntities() {
-		while (this.entitiesToDestroy.length > 0) {
-			this.destroyEntity(this.entitiesToDestroy.pop()!);
-		}
+		this.effects.run();
 	}
 
 	private destroyEntity(entity: Entity): void {
 		this.entities.delete(entity.id);
-		for (const entities of this.systems.values()) {
-			entities.delete(entity);
+		for (const system of this.systems.values()) {
+			system.entities.delete(entity);
 		}
 	}
 
 	public updateEntitySystems(entity: Entity): void {
-		for (const system of this.systems.keys()) {
+		for (const system of this.systems.values()) {
 			this.updateEntitySystem(entity, system);
 		}
 	}
@@ -82,16 +79,14 @@ export class ECS {
 		const need = system.componentsRequired;
 
 		if (entity.components.hasAll(need)) {
-			const systemEntities = this.systems.get(system)!;
-			if (!systemEntities.has(entity)) {
-				systemEntities.add(entity);
+			if (!system.entities.has(entity)) {
+				system.entities.add(entity);
 				system.onEntityAdded(entity);
 			}
 		} else {
-			const systemEntities = this.systems.get(system)!;
-			if (systemEntities.has(entity)) {
+			if (system.entities.has(entity)) {
 				system.onEntityRemoved(entity);
-				systemEntities.delete(entity);
+				system.entities.delete(entity);
 			}
 		}
 	}

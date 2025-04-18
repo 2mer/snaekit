@@ -1,13 +1,17 @@
-// export type EntityId = string;
-
 import type { Component } from "./Component";
 import { ComponentContainer } from "./ComponentContainer";
 import type { ECS } from "./ECS";
+import { EventEmitter } from "eventemitter3";
 
 export type EntityId = Entity["id"];
 
+export type EntityEvents = {
+	componentChanged: (entity: Entity, component: Component) => void;
+};
+
 export class Entity {
 	components: ComponentContainer;
+	events = new EventEmitter<EntityEvents>();
 
 	constructor(
 		public readonly id: string,

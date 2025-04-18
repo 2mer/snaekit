@@ -51,9 +51,7 @@ export class Movement<T extends GenericPoint<T>> extends System {
 	}
 
 	update() {
-		const entities = this.ecs.getSystemEntities(this)!;
-
-		for (const entity of entities) {
+		for (const entity of this.entities) {
 			const moving$ = entity.$(Moving<T>);
 			const position$ = entity.$(Position<T>);
 
@@ -78,10 +76,8 @@ export class Movement<T extends GenericPoint<T>> extends System {
 
 			const wishPos = position$.position.clone().add(moving$.direction);
 
-			// update the matrix
-			this.world.updateEntity(entity, () => {
-				position$.position.set(wishPos);
-			});
+			position$.position.set(wishPos);
+			position$.onChanged();
 		}
 	}
 }

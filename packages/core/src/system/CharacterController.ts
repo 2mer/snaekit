@@ -1,27 +1,28 @@
-import { type ComponentClass, type Entity, System } from "@snaekit/ecs";
-import { Snake } from "../component/Snake";
+import { type ComponentClass, Effects, System } from "@snaekit/ecs";
 import type { GenericPoint } from "@sgty/point";
-import type { Movement } from "./Movement";
+import { Controlled } from "../component/Controlled";
+import { WishDir } from "../component/WishDir";
 
 export class CharacterController<T extends GenericPoint<T>> extends System {
-	componentsRequired: Set<ComponentClass> = new Set([Snake<T>]);
-	character: Entity | undefined = undefined;
+	componentsRequired: Set<ComponentClass> = new Set([
+		Controlled<T>,
+		WishDir<T>,
+	]);
 
-	constructor(public movement: Movement<T>) {
-		super();
-	}
+	effects = new Effects();
 
-	onEntityAdded(entity: Entity): void {
-		this.character = entity;
-	}
-
-	onEntityRemoved(_: Entity): void {
-		this.character = undefined;
+	update(): void {
+		this.effects.run();
 	}
 
 	setMoveDirection(direction: T) {
-		const snake = this.character!.$(Snake<T>);
+		this.effects.once(() => {
+			for (const entity of this.entities) {
+				const controlled = entity.$(Controlled<T>);
+				const wishDir = entity.$(WishDir<T>);
 
-		snake.propagateMotion(this.movement, direction);
+				wishDir.direction = controlled.getWishDir(direction);
+			}
+		});
 	}
 }

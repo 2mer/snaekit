@@ -5,6 +5,10 @@ export abstract class Component {
 
 	public onAdded() {}
 	public onRemoved() {}
+
+	public onChanged() {
+		this.entity.events.emit("componentChanged", this.entity, this);
+	}
 }
 
 export type ComponentClass = new (...args: any) => Component;
