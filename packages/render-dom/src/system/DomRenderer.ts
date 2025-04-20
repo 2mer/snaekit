@@ -43,44 +43,5 @@ export class DomRenderer extends System {
 
 	onEntityAdded(entity: Entity): void {
 		super.onEntityAdded(entity);
-		console.log("entityadded!");
 	}
-
-	// update() {
-	// 	for (const entity of this.entities) {
-	// 		const domRenderable = entity.$(DomRenderable);
-	// 		const position$ = entity.$(Position2D);
-
-	// 		domRenderable.element.style.setProperty(
-	// 			"left",
-	// 			`calc(var(--cell-size) * ${position$.position.x})`,
-	// 		);
-	// 		domRenderable.element.style.setProperty(
-	// 			"top",
-	// 			`calc(var(--cell-size) * ${position$.position.y})`,
-	// 		);
-	// 	}
-	// }
-
-	// onEntityAdded(entity: Entity): void {
-	// 	const domRenderable = entity.$(DomRenderable);
-	// 	const position = entity.$(Position2D);
-
-	// 	domRenderable.element.style.setProperty(
-	// 		"left",
-	// 		`calc(var(--cell-size) * ${position.position.x})`,
-	// 	);
-	// 	domRenderable.element.style.setProperty(
-	// 		"top",
-	// 		`calc(var(--cell-size) * ${position.position.y})`,
-	// 	);
-
-	// 	this.root.appendChild(domRenderable.element);
-	// }
-
-	// onEntityRemoved(entity: Entity): void {
-	// 	const domRenderable = entity.$(DomRenderable);
-
-	// 	this.root.removeChild(domRenderable.element);
-	// }
 }

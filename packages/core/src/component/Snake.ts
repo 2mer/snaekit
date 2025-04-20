@@ -33,7 +33,11 @@ export class Snake<T extends GenericPoint<T>> extends Component {
 			this.entity,
 			direction,
 		);
-		const canMove = movementSystem.canEntityMove(this.entity, collisions);
+		const canMove = movementSystem.canEntityMove(
+			this.entity,
+			direction,
+			collisions,
+		);
 
 		this.setMovingEnabled(canMove);
 

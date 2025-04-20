@@ -35,9 +35,12 @@ export class Movement<T extends GenericPoint<T>> extends System {
 
 	public canEntityMove(
 		entity: Entity,
-		collisions = this.getEntityCollisions(entity),
+		direction: T,
+		collisions: Collider<T>[],
 	) {
-		return collisions.every((collider) => !collider.options.isSolid(entity));
+		return collisions.every(
+			(collider) => !collider.options.isSolid(entity, direction),
+		);
 	}
 
 	public handleEntityCollisions(
@@ -60,7 +63,7 @@ export class Movement<T extends GenericPoint<T>> extends System {
 			}
 
 			const collisions = this.getEntityCollisions(entity, moving$.direction);
-			const canMove = this.canEntityMove(entity, collisions);
+			const canMove = this.canEntityMove(entity, moving$.direction, collisions);
 
 			this.handleEntityCollisions(entity, moving$.direction, collisions);
 

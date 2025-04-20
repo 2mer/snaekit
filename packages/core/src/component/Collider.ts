@@ -8,7 +8,7 @@ export class Collider<T extends GenericPoint<T>> extends Component {
 	constructor(
 		public options: {
 			onCollide?: (entity: Entity, direction: T) => void;
-			isSolid: (entity: Entity) => boolean;
+			isSolid: (entity: Entity, direction: T) => boolean;
 		},
 	) {
 		super();
