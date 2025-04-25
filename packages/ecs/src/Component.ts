@@ -9,6 +9,8 @@ export abstract class Component {
 	public onChanged() {
 		this.entity.events.emit("componentChanged", this.entity, this);
 	}
+
+	public destroy() {}
 }
 
 export type ComponentClass = new (...args: any) => Component;

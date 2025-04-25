@@ -1,13 +1,19 @@
-import type { Component } from "./Component";
+import EventEmitter from "eventemitter3";
+import type { Component, ComponentClass } from "./Component";
 import { Effects } from "./Effects";
 import { Entity, type EntityId } from "./Entity";
 import type { System, SystemClass } from "./System";
 import { v4 } from "uuid";
 
+export type ECSEvents = {
+	destroy: () => void;
+};
+
 export class ECS {
 	private entities = new Map<EntityId, Entity>();
 	private systems = new Map<SystemClass, System>();
 	public effects = new Effects();
+	public events = new EventEmitter<ECSEvents>();
 
 	public addEntity(...components: Component[]): Entity {
 		const id = v4();
@@ -89,5 +95,24 @@ export class ECS {
 				system.entities.delete(entity);
 			}
 		}
+	}
+
+	public query(...components: ComponentClass[]): Entity[] {
+		return Array.from(this.entities.values()).filter((entity) => {
+			return entity.components.hasAll(components);
+		});
+	}
+
+	destroy() {
+		this.events.emit("destroy");
+
+		this.systems.forEach((system) => {
+			system.destroy();
+		});
+		this.entities.forEach((entity) => {
+			entity.destroy();
+		});
+
+		this.events.removeAllListeners();
 	}
 }

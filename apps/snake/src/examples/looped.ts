@@ -9,9 +9,9 @@ import {
 } from "@snaekit/core";
 import { DomRenderable, DomRenderer, Position2D } from "@snaekit/render-dom";
 import { Example } from "../util/Example";
-import { createWalledWorld } from "./impl/world/createWalledWorld";
-import { createSimpleController } from "./impl/game/createSimpleController";
+import { createLoopedWorld } from "./impl/world/createLoopedWorld";
 import { createApple } from "./impl/foods/apple";
+import { createSimpleController } from "./impl/game/createSimpleController";
 
 export default Example((root, ecs) => {
 	const CELL_SIZE = 50;
@@ -21,15 +21,15 @@ export default Example((root, ecs) => {
 	root.style.setProperty("--world-size", String(WORLD_SIZE));
 	root.classList.add("world");
 
-	const world = createWalledWorld({
+	const world = createLoopedWorld({
 		ecs,
 		worldSize: WORLD_SIZE,
 	});
 
 	const renderer = new DomRenderer(root);
 	const movement = new Movement(world);
-	const slither = new Slither();
 	const controller = createSimpleController({});
+	const slither = new Slither();
 
 	ecs.addSystem(world);
 	ecs.addSystem(controller);

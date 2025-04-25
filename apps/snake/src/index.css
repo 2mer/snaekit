@@ -1,19 +1,22 @@
-.world {
-	/* --cell-size: 50px;
-	--world-size: 10; */
-	position: relative;
-	width: calc(var(--cell-size) * var(--world-size));
-	height: calc(var(--cell-size) * var(--world-size));
-	border: 4px solid rgb(76, 96, 214);
-	background: rgb(145, 226, 182)
+@import "tailwindcss";
+
+button {
+	@apply bg-slate-400 px-4 py-2 rounded-md cursor-pointer transition-all duration-200;
+
+	&:hover {
+		@apply bg-slate-500;
+	}
+
+	&:active {
+		@apply bg-slate-300 ring-2 ring-slate-800;
+	}
 }
 
-.tile {
-	position: absolute;
-	width: var(--cell-size);
-	height: var(--cell-size);
+html,
+body {
+	@apply inset-0 bg-slate-200;
 }
 
-.apple {
-	border-radius: 50%;
+pre {
+	@apply bg-slate-300 rounded-md p-4;
 }

@@ -13,12 +13,10 @@ export class DomRenderer extends System {
 
 		this.useEffect((entity) => {
 			const domRenderable = entity.$(DomRenderable);
-			console.log("in effect");
 
 			this.root.appendChild(domRenderable.element);
 
 			return () => {
-				console.log("cleanup!");
 				this.root.removeChild(domRenderable.element);
 			};
 		}, []);

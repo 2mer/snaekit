@@ -11,11 +11,14 @@
 	},
 	"dependencies": {
 		"@sgty/point": "^1.0.8",
+		"@sgty/sigma": "^1.0.2",
 		"@snaekit/core": "workspace:^",
 		"@snaekit/ecs": "workspace:^",
 		"@snaekit/render-dom": "workspace:^",
+		"@tailwindcss/vite": "^4.1.4",
 		"react": "^19.0.0",
-		"react-dom": "^19.0.0"
+		"react-dom": "^19.0.0",
+		"tailwindcss": "^4.1.4"
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.21.0",

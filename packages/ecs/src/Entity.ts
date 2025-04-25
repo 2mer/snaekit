@@ -25,4 +25,9 @@ export class Entity {
 	): InstanceType<T> {
 		return this.components.get(componentClass);
 	}
+
+	public destroy() {
+		this.events.removeAllListeners();
+		this.components.destroy();
+	}
 }

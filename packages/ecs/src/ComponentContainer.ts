@@ -43,4 +43,10 @@ export class ComponentContainer {
 			this.map.delete(componentClass);
 		}
 	}
+
+	public destroy() {
+		this.map.forEach((component) => {
+			component.destroy();
+		});
+	}
 }
