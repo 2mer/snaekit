@@ -1,24 +1,25 @@
-import { type Point2D, vec2 } from "@sgty/point";
-import { Controlled, Moving, Snake, WishDir } from "@snaekit/core";
-import { DomRenderable, Position2D } from "@snaekit/render-dom";
+import { Snake } from "@snaekit/core";
+import { Position2D } from "@snaekit/render-dom";
 import { Example } from "../util/Example";
 import simple from "./simple";
+import { createSimpleSnake } from "./impl/snakes/simple/createSimpleSnake";
 
-export default Example((root, ecs) => {
-	simple(root, ecs);
+export default Example((ctx) => {
+	simple(ctx);
+
+	const { ecs, onGameOver } = ctx;
 
 	const [player] = ecs.query(Snake);
 
 	player.$(Position2D).position.set(3, 3);
+	player.$(Position2D).onChanged();
 
-	const playerMirror = ecs.addEntity(
-		new Position2D(vec2(6, 6)),
-		new DomRenderable()
-			.cls("tile")
-			.styled({ backgroundColor: "blue", zIndex: "10" }),
-		new Moving(vec2()),
-		new WishDir(vec2()),
-		new Snake(),
-		new Controlled<Point2D>((dir) => dir.clone().mul(-1)),
-	);
+	const playerMirror = createSimpleSnake({
+		ecs,
+		color: "blue",
+		onHarm: onGameOver,
+	});
+
+	playerMirror.$(Position2D).position.set(6, 6);
+	playerMirror.$(Position2D).onChanged();
 });

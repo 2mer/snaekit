@@ -10,7 +10,7 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
-		"@sgty/point": "^1.0.8",
+		"@sgty/point": "^1.0.11",
 		"@sgty/sigma": "^1.0.2",
 		"@snaekit/core": "workspace:^",
 		"@snaekit/ecs": "workspace:^",

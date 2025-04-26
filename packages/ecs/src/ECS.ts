@@ -7,13 +7,18 @@ import { v4 } from "uuid";
 
 export type ECSEvents = {
 	destroy: () => void;
+	init: () => void;
 };
 
 export class ECS {
 	private entities = new Map<EntityId, Entity>();
 	private systems = new Map<SystemClass, System>();
-	public effects = new Effects();
+	private systemPriority = new Map<SystemClass, number>();
+	public effects = new Effects<number>();
 	public events = new EventEmitter<ECSEvents>();
+	private initialized = false;
+
+	private sortedSystems!: System[];
 
 	public addEntity(...components: Component[]): Entity {
 		const id = v4();
@@ -38,13 +43,7 @@ export class ECS {
 		});
 	}
 
-	public addSystem(system: System): void {
-		if (system.componentsRequired.size === 0) {
-			console.warn("System not added: empty Components list.");
-			console.warn(system);
-			return;
-		}
-
+	public addSystem<T extends System>(system: T, priority = 0): T {
 		system.ecs = this;
 
 		this.systems.set(system.constructor as SystemClass, system);
@@ -52,6 +51,29 @@ export class ECS {
 		for (const entity of this.entities.values()) {
 			this.updateEntitySystem(entity, system);
 		}
+
+		this.systemPriority.set(system.constructor as SystemClass, priority);
+
+		this.computeSystemOrder();
+
+		if (this.initialized) {
+			system.init();
+		}
+
+		return system;
+	}
+
+	private computeSystemOrder() {
+		this.sortedSystems = Array.from(this.systems.values()).sort(
+			(systemA, systemB) => {
+				const priorityA =
+					this.systemPriority.get(systemA.constructor as SystemClass) ?? 0;
+				const priorityB =
+					this.systemPriority.get(systemB.constructor as SystemClass) ?? 0;
+
+				return priorityA - priorityB;
+			},
+		);
 	}
 
 	public getSystem<T extends SystemClass>(system: T) {
@@ -62,10 +84,16 @@ export class ECS {
 		this.systems.delete(system.constructor as SystemClass);
 	}
 
-	public update(logicFn: () => void): void {
-		logicFn();
+	private lastUpdate = 0;
+	public update(): void {
+		const now = Date.now();
+		const delta = now - this.lastUpdate;
+		this.lastUpdate = now;
 
-		this.effects.run();
+		this.sortedSystems.forEach((system) => {
+			system.update(delta);
+		});
+		this.effects.run(delta);
 	}
 
 	private destroyEntity(entity: Entity): void {
@@ -103,7 +131,12 @@ export class ECS {
 		});
 	}
 
-	destroy() {
+	public setPriorities(priorities: Map<SystemClass, number>) {
+		this.systemPriority = priorities;
+		this.computeSystemOrder();
+	}
+
+	public destroy() {
 		this.events.emit("destroy");
 
 		this.systems.forEach((system) => {
@@ -114,5 +147,22 @@ export class ECS {
 		});
 
 		this.events.removeAllListeners();
+	}
+
+	/**
+	 * Systems/components can register to the init event in order to setup initial values before the first update
+	 * this is useful for systems that want to have their update function called on start without having a reference to the ecs update function
+	 */
+	public init() {
+		if (this.initialized) {
+			console.warn("ECS is already initialized");
+			return;
+		}
+
+		this.systems.forEach((system) => {
+			system.init();
+		});
+
+		this.events.emit("init");
 	}
 }

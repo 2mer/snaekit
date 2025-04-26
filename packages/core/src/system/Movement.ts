@@ -1,15 +1,17 @@
 import { type ComponentClass, type Entity, System } from "@snaekit/ecs";
 import { Moving } from "../component/Moving";
 import { Position } from "../component/Position";
-import type { World } from "./World";
+import { World } from "./World";
 import { Collider } from "../component/Collider";
 import type { GenericPoint } from "@sgty/point";
 
 export class Movement<T extends GenericPoint<T>> extends System {
 	componentsRequired: Set<ComponentClass> = new Set([Moving, Position]);
 
-	constructor(public world: World<T>) {
-		super();
+	public world!: World<T>;
+
+	init(): void {
+		this.world = this.ecs.getSystem(World<T>)!;
 	}
 
 	public getEntityDirection(entity: Entity) {

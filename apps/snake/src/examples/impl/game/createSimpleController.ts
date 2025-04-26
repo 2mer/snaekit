@@ -1,4 +1,4 @@
-import type { Point2D } from "@sgty/point";
+import type { GenericPoint, Point2D } from "@sgty/point";
 import { CharacterController } from "@snaekit/core";
 import { Direction } from "../../../util/Direction";
 
@@ -35,4 +35,15 @@ export function createSimpleController(options: ControllerOptions) {
 	});
 
 	return controller;
+}
+
+export function ignoreBackwardDirection<T extends GenericPoint<T>>(
+	wishDir: T,
+	prevDir: T,
+) {
+	if (wishDir.clone().mul(-1).equals(prevDir)) {
+		return prevDir;
+	}
+
+	return wishDir;
 }

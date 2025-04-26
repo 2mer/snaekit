@@ -2,6 +2,7 @@ import { type Point2D, vec2 } from "@sgty/point";
 import { Moving, Collider, Snake } from "@snaekit/core";
 import type { ECS } from "@snaekit/ecs";
 import { Position2D, DomRenderable } from "@snaekit/render-dom";
+import { tryHarmEntity } from "../../game/tryHarmEntity";
 
 export function createSimpleSnakePart(ecs: ECS, position?: Point2D) {
 	const part = ecs.addEntity(
@@ -12,9 +13,7 @@ export function createSimpleSnakePart(ecs: ECS, position?: Point2D) {
 		new Moving(vec2()),
 		new Collider({
 			onCollide(entity) {
-				if (entity.components.has(Snake)) {
-					alert("game over!");
-				}
+				tryHarmEntity({ target: entity, attacker: part });
 			},
 			isSolid(entity) {
 				return entity.components.has(Snake);

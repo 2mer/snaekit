@@ -17,7 +17,7 @@ export abstract class System {
 	 */
 	public abstract componentsRequired: Set<ComponentClass>;
 
-	public update() {
+	public update(delta: number) {
 		this.entityEffects.run();
 	}
 
@@ -32,6 +32,8 @@ export abstract class System {
 	public useEffect(effectFn: Effect<Entity>, deps: ComponentClass[]) {
 		this.entityEffects.addEffect(effectFn, deps);
 	}
+
+	init() {}
 
 	destroy() {
 		this.entities.clear();

@@ -1,19 +1,13 @@
-import { vec2 } from "@sgty/point";
-import {
-	Controlled,
-	Movement,
-	Moving,
-	Slither,
-	Snake,
-	WishDir,
-} from "@snaekit/core";
-import { DomRenderable, DomRenderer, Position2D } from "@snaekit/render-dom";
+import { Movement, Slither } from "@snaekit/core";
+import { DomRenderer } from "@snaekit/render-dom";
 import { Example } from "../util/Example";
 import { createWalledWorld } from "./impl/world/createWalledWorld";
 import { createSimpleController } from "./impl/game/createSimpleController";
 import { createApple } from "./impl/foods/apple";
+import { createSimpleSnake } from "./impl/snakes/simple/createSimpleSnake";
+import { useUpdateLoop } from "./impl/game/useUpdateLoop";
 
-export default Example((root, ecs) => {
+export default Example(({ root, ecs, onGameOver }) => {
 	const CELL_SIZE = 50;
 	const WORLD_SIZE = 10;
 
@@ -21,53 +15,20 @@ export default Example((root, ecs) => {
 	root.style.setProperty("--world-size", String(WORLD_SIZE));
 	root.classList.add("world");
 
-	const world = createWalledWorld({
-		ecs,
-		worldSize: WORLD_SIZE,
-	});
-
-	const renderer = new DomRenderer(root);
-	const movement = new Movement(world);
-	const slither = new Slither();
-	const controller = createSimpleController({});
-
-	ecs.addSystem(world);
-	ecs.addSystem(controller);
-	ecs.addSystem(slither);
-	ecs.addSystem(movement);
-	ecs.addSystem(renderer);
-
-	function update() {
-		ecs.update(() => {
-			controller.update();
-			slither.update();
-			movement.update();
-			world.update();
-			renderer.update();
-		});
-	}
-
-	const player = ecs.addEntity(
-		new Position2D(vec2(0, 0)),
-		new DomRenderable()
-			.cls("tile")
-			.styled({ backgroundColor: "red", zIndex: "10" }),
-		new Moving(vec2()),
-		new WishDir(vec2()),
-		new Snake(),
-		new Controlled(),
+	const controller = ecs.addSystem(createSimpleController({}));
+	const slither = ecs.addSystem(new Slither());
+	const movement = ecs.addSystem(new Movement());
+	const world = ecs.addSystem(
+		createWalledWorld({
+			ecs,
+			worldSize: WORLD_SIZE,
+		}),
 	);
+	const renderer = ecs.addSystem(new DomRenderer(root));
+
+	const player = createSimpleSnake({ ecs, color: "red", onHarm: onGameOver });
 
 	const apple = createApple({ ecs, world, worldSize: WORLD_SIZE });
 
-	world.update();
-	renderer.update();
-
-	const loopInterval = setInterval(() => {
-		update();
-	}, 250);
-
-	ecs.events.on("destroy", () => {
-		clearInterval(loopInterval);
-	});
+	useUpdateLoop(ecs);
 });

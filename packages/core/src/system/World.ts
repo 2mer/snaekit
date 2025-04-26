@@ -28,31 +28,9 @@ export class World<TPos extends GenericPoint<TPos>> extends System {
 		);
 	}
 
-	// onEntityAdded(entity: Entity): void {
-	// 	const pos = entity.$(Position<TPos>);
-	// 	const cell = this.worldMap.get(pos.position) ?? new Set<Entity>();
-
-	// 	cell.add(entity);
-
-	// 	this.worldMap.set(pos.position, cell);
-	// }
-
-	// onEntityRemoved(entity: Entity): void {
-	// 	const pos = entity.$(Position<TPos>);
-	// 	const cell = this.worldMap.get(pos.position);
-
-	// 	cell.delete(entity);
-
-	// 	this.worldMap.set(pos.position, cell);
-	// }
-
-	// updateEntity(entity: Entity, updateFn: () => void): void {
-	// 	this.onEntityRemoved(entity);
-
-	// 	updateFn();
-
-	// 	this.onEntityAdded(entity);
-	// }
+	init() {
+		this.update(0);
+	}
 
 	getEntitiesAt(position: TPos) {
 		return this.worldMap.get(position);

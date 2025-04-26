@@ -3,15 +3,45 @@ import { Component, type Entity } from "@snaekit/ecs";
 import { Moving } from "./Moving";
 import type { Movement } from "../system/Movement";
 
+class Node extends Component {
+	/**
+	 * will eventually reach the head
+	 */
+	prev?: Node;
+	/**
+	 * will eventually reach the tail
+	 */
+	next?: Node;
+}
+
 export class Snake<T extends GenericPoint<T>> extends Component {
 	parts: Array<Entity> = [];
 
+	static Tail = class Tail extends Component {};
+	static Head = class Head extends Component {};
+	static Node = Node;
+
 	onAdded(): void {
 		// add the head of the snake on init
+		this.entity.components.add(new Snake.Head());
 		this.grow(this.entity);
 	}
 
 	grow(entity: Entity) {
+		const newNode = new Snake.Node();
+
+		if (this.parts.length) {
+			const tail = this.getTailEntity();
+			tail.components.delete(Snake.Tail);
+			const node = tail.$(Snake.Node);
+
+			node.next = newNode;
+			newNode.prev = node;
+
+			node.onChanged();
+		}
+
+		entity.components.add(new Snake.Tail(), newNode);
 		this.parts.push(entity);
 	}
 
@@ -24,6 +54,7 @@ export class Snake<T extends GenericPoint<T>> extends Component {
 		const prevDirection = moving.direction.clone();
 
 		moving.direction.set(newDirection);
+		moving.onChanged();
 
 		return prevDirection;
 	}

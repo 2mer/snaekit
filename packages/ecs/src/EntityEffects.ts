@@ -1,10 +1,5 @@
 import type { Component, ComponentClass } from "./Component";
-import {
-	type Effect,
-	type EffectCleanup,
-	type EffectEntry,
-	Effects,
-} from "./Effects";
+import { type Effect, type EffectEntry, Effects } from "./Effects";
 import type { Entity } from "./Entity";
 
 type EffectDefinition = { effect: Effect<Entity>; deps: ComponentClass[] };
@@ -80,15 +75,6 @@ export class EntityEffects {
 		// run mount effects
 		for (const effectDefinition of this.effectDefinitions.values()) {
 			const effectEntry = { effect: effectDefinition.effect, once: true };
-
-			// add entry to component lookup
-			// for (const dep of effectDefinition.deps) {
-			// 	if (!this.depToEffectEntriesMap.has(dep)) {
-			// 		this.depToEffectEntriesMap.set(dep, new Set())
-			// 	}
-
-			// 	this.depToEffectEntriesMap.get(dep)!.add(effectEntry);
-			// }
 
 			ctx.effectEntriesMap.set(effectDefinition, effectEntry);
 			ctx.queue.add(effectEntry);

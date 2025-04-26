@@ -1,8 +1,15 @@
 import type { ECS } from "@snaekit/ecs";
 
+export type ExampleContext = {
+	root: HTMLDivElement;
+	ecs: ECS;
+	onGameOver: () => void;
+	onRestart: () => void;
+};
+
 export type Example =
-	| ((root: HTMLDivElement, ecs: ECS) => void)
-	| ((root: HTMLDivElement, ecs: ECS) => () => void);
+	| ((ctx: ExampleContext) => void)
+	| ((ctx: ExampleContext) => () => void);
 export function Example(e: Example) {
 	return e;
 }

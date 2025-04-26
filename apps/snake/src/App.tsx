@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from "react";
-import type { Example } from "./util/Example";
+import type { Example, ExampleContext } from "./util/Example";
 import { signal } from "@sgty/sigma";
 import { ECS } from "@snaekit/ecs";
 
@@ -26,8 +26,6 @@ function App() {
 	const gameRef = useRef<HTMLDivElement>(null);
 	const exampleIndex = exampleIndex$.use();
 
-	console.log({ exampleIndex })
-
 	const currentExample = useMemo(() => {
 		const [exPath, exMod] = exampleEntries[exampleIndex];
 		const [, codeMod] = exampleCodeEntries[exampleIndex];
@@ -44,7 +42,15 @@ function App() {
 		gameRef.current!.appendChild(el);
 
 		const ecs = new ECS();
-		currentExample.run(el, ecs);
+
+		function onGameOver() { };
+
+		function onRestart() { };
+
+		const ctx: ExampleContext = { ecs, root: el, onGameOver, onRestart }
+		currentExample.run(ctx);
+
+		ecs.init();
 
 		return () => {
 			ecs.destroy();

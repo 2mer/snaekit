@@ -11,6 +11,31 @@
 	position: absolute;
 	width: var(--cell-size);
 	height: var(--cell-size);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	transition: all 200ms;
+
+	&:nth-child(even) {
+		filter: brightness(1.2)
+	}
+}
+
+.head {
+	border-top-right-radius: 50%;
+	border-bottom-right-radius: 50%;
+
+	&::after {
+		content: ':)';
+		font-weight: 900;
+		font-size: larger;
+
+	}
+}
+
+.tail {
+	border-top-left-radius: 50%;
+	border-bottom-left-radius: 50%;
 }
 
 .apple {
