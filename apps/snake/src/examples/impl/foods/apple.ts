@@ -20,10 +20,8 @@ export function createApple({
 			onCollide(entity) {
 				if (entity.components.has(Snake)) {
 					const snake = entity.$(Snake);
-					const tail = snake.getTailEntity();
-					const tailPosition = tail.$(Position2D).position;
 
-					snake.grow(createSimpleSnakePart(ecs, tailPosition.clone()));
+					snake.grow(createSimpleSnakePart(ecs, entity));
 
 					const myPos = apple.$(Position2D);
 					myPos.position.set(randomFreePosition(world, 0, worldSize));

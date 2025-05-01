@@ -1,5 +1,5 @@
 import { Movement, Slither } from "@snaekit/core";
-import { DomRenderer } from "@snaekit/render-dom";
+import { DomRenderable, DomRenderer } from "@snaekit/render-dom";
 import { Example } from "../util/Example";
 import { createWalledWorld } from "./impl/world/createWalledWorld";
 import { createSimpleController } from "./impl/game/createSimpleController";
@@ -26,7 +26,12 @@ export default Example(({ root, ecs, onGameOver }) => {
 	);
 	const renderer = ecs.addSystem(new DomRenderer(root));
 
-	const player = createSimpleSnake({ ecs, color: "red", onHarm: onGameOver });
+	const player = createSimpleSnake({
+		ecs,
+		color: "red",
+		onHarm: onGameOver,
+		layer: renderer.createLayer(),
+	});
 
 	const apple = createApple({ ecs, world, worldSize: WORLD_SIZE });
 

@@ -2,7 +2,18 @@ import { type ComponentClass, type Entity, System } from "@snaekit/ecs";
 import { DomRenderable } from "../component/DomRenderable";
 import { Position2D } from "../component/util/Position2D";
 import { Moving, Snake } from "@snaekit/core";
-import type { Point2D } from "@sgty/point";
+import { vec2, type Point2D } from "@sgty/point";
+import { Direction } from "../component/util/Direction";
+
+function turnDirection(currentAngleDegrees: number, nextAngleDegrees: number) {
+	let delta = nextAngleDegrees - currentAngleDegrees;
+
+	// Normalize to [-180, 180]
+	if (delta > 180) delta -= 360;
+	if (delta < -180) delta += 360;
+
+	return delta > 0 ? "left" : "right";
+}
 
 export class DomRenderer extends System {
 	componentsRequired: Set<ComponentClass> = new Set([
@@ -16,10 +27,12 @@ export class DomRenderer extends System {
 		this.useEffect((entity) => {
 			const domRenderable = entity.$(DomRenderable);
 
-			this.root.appendChild(domRenderable.element);
+			const target = domRenderable._layer ?? this.root;
+
+			target.appendChild(domRenderable.element);
 
 			return () => {
-				this.root.removeChild(domRenderable.element);
+				target.removeChild(domRenderable.element);
 			};
 		}, []);
 
@@ -105,10 +118,38 @@ export class DomRenderer extends System {
 					facing = moving.direction;
 				}
 
-				domRenderable.element.style.setProperty(
-					"transform",
-					`rotate(${facing.angleDeg()}deg)`,
-				);
+				// domRenderable.element.style.setProperty(
+				// 	"transform",
+				// 	`rotate(${facing.angleDeg()}deg)`,
+				// );
+				domRenderable.element.classList.remove("up", "down", "left", "right");
+				if (facing.equals(Direction.DOWN)) {
+					domRenderable.element.classList.add("down");
+				} else if (facing.equals(Direction.UP)) {
+					domRenderable.element.classList.add("up");
+				} else if (facing.equals(Direction.LEFT)) {
+					domRenderable.element.classList.add("left");
+				} else if (facing.equals(Direction.RIGHT)) {
+					domRenderable.element.classList.add("right");
+				}
+
+				if (node.next && node.prev) {
+					const prevDir = node.prev.entity.$(Moving<Point2D>).direction;
+					const curDir = entity.$(Moving<Point2D>).direction;
+
+					domRenderable.element.classList.remove("turnRight", "turnLeft");
+
+					if (!curDir.equals(prevDir)) {
+						const turnDir = turnDirection(
+							curDir.angleDeg(),
+							prevDir.angleDeg(),
+						);
+
+						domRenderable.element.classList.add(
+							turnDir === "right" ? "turnLeft" : "turnRight",
+						);
+					}
+				}
 			},
 			[Moving],
 		);
@@ -120,5 +161,14 @@ export class DomRenderer extends System {
 
 	onEntityAdded(entity: Entity): void {
 		super.onEntityAdded(entity);
+	}
+
+	public createLayer() {
+		const el = document.createElement("div");
+		el.classList.add("layer");
+
+		this.root.appendChild(el);
+
+		return el;
 	}
 }

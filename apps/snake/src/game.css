@@ -1,3 +1,17 @@
+@theme {
+	--radius-f: 50%;
+}
+
+@keyframes tileIn {
+	0% {
+		transform: scale(0);
+	}
+
+	100% {
+		transform: scale(1);
+	}
+}
+
 .world {
 	box-sizing: content-box;
 	position: relative;
@@ -8,36 +22,132 @@
 }
 
 .tile {
+	border-radius: 0;
+
 	position: absolute;
 	width: var(--cell-size);
 	height: var(--cell-size);
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	/* transition: top 200ms, left 200ms, border 200ms, transform 200ms, border-radius 200ms; */
 	transition: all 200ms;
+	animation: tileIn 200ms;
 
 	&:nth-child(even) {
 		filter: brightness(1.2)
 	}
+
+	&::after {
+		transition: all 200ms;
+	}
 }
 
 .head {
-	border-top-right-radius: 50%;
-	border-bottom-right-radius: 50%;
 
 	&::after {
 		content: ':)';
 		font-weight: 900;
 		font-size: larger;
+	}
 
+	&.up {
+		@apply rounded-t-f;
+	}
+
+	&.down {
+		@apply rounded-b-f;
+	}
+
+	&.left {
+		@apply rounded-l-f;
+	}
+
+	&.right {
+		@apply rounded-r-f;
 	}
 }
 
 .tail {
-	border-top-left-radius: 50%;
-	border-bottom-left-radius: 50%;
+	&.up {
+		@apply rounded-b-f;
+	}
+
+	&.down {
+		@apply rounded-t-f;
+	}
+
+	&.left {
+		@apply rounded-r-f;
+	}
+
+	&.right {
+		@apply rounded-l-f;
+	}
 }
 
 .apple {
 	border-radius: 50%;
+}
+
+.layer {
+	filter: drop-shadow(2px 2px 0px black) drop-shadow(-2px -2px 0px black) drop-shadow(-2px 2px 0px black) drop-shadow(2px -2px 0px black)
+}
+
+.turnRight {
+
+	/* border-top-right-radius: 50%; */
+	&.up {
+		@apply rounded-tl-f;
+	}
+
+	&.down {
+		@apply rounded-br-f;
+	}
+
+	&.left {
+		@apply rounded-bl-f;
+	}
+
+	&.right {
+		@apply rounded-tr-f;
+	}
+}
+
+.turnLeft {
+	/* border-bottom-right-radius: 50%; */
+
+	&.up {
+		@apply rounded-tr-f;
+	}
+
+	&.down {
+		@apply rounded-bl-f;
+	}
+
+	&.left {
+		@apply rounded-tl-f;
+	}
+
+	&.right {
+		@apply rounded-br-f;
+	}
+}
+
+.tile {
+	&.up::after {
+		transform: rotate(-90deg);
+	}
+
+	&.down::after {
+		transform: rotate(90deg);
+	}
+
+	&.left::after {
+		transform: rotate(180deg);
+	}
+
+	&.right::after {
+		transform: rotate(0deg);
+	}
 }

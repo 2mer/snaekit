@@ -1,6 +1,8 @@
 import { Component } from "@snaekit/ecs";
 
 export class DomRenderable extends Component {
+	public _layer?: HTMLElement;
+
 	constructor(
 		public readonly element: HTMLElement = document.createElement("div"),
 	) {
@@ -22,6 +24,11 @@ export class DomRenderable extends Component {
 	uncls(...classes: string[]) {
 		this.element.classList.remove(...classes);
 
+		return this;
+	}
+
+	layer(layer: HTMLElement) {
+		this._layer = layer;
 		return this;
 	}
 }

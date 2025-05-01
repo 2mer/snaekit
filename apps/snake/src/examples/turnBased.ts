@@ -1,11 +1,12 @@
 import { Movement, Slither } from "@snaekit/core";
 import { DomRenderer } from "@snaekit/render-dom";
 import { Example } from "../util/Example";
-import { createLoopedWorld } from "./impl/world/createLoopedWorld";
-import { createApple } from "./impl/foods/apple";
+import { createWalledWorld } from "./impl/world/createWalledWorld";
 import { createSimpleController } from "./impl/game/createSimpleController";
+import { createApple } from "./impl/foods/apple";
 import { createSimpleSnake } from "./impl/snakes/simple/createSimpleSnake";
-import { useUpdateLoop } from "./impl/game/useUpdateLoop";
+import { type Point2D, vec2 } from "@sgty/point";
+import { Direction } from "../util/Direction";
 
 export default Example(({ root, ecs, onGameOver }) => {
 	const CELL_SIZE = 50;
@@ -15,11 +16,18 @@ export default Example(({ root, ecs, onGameOver }) => {
 	root.style.setProperty("--world-size", String(WORLD_SIZE));
 	root.classList.add("world");
 
-	const controller = ecs.addSystem(createSimpleController({}));
+	const controller = ecs.addSystem(
+		createSimpleController({
+			turnBased: true,
+			update: () => {
+				ecs.update();
+			},
+		}),
+	);
 	const slither = ecs.addSystem(new Slither());
 	const movement = ecs.addSystem(new Movement());
 	const world = ecs.addSystem(
-		createLoopedWorld({
+		createWalledWorld({
 			ecs,
 			worldSize: WORLD_SIZE,
 		}),
@@ -35,7 +43,19 @@ export default Example(({ root, ecs, onGameOver }) => {
 
 	const apple = createApple({ ecs, world, worldSize: WORLD_SIZE });
 
-	useUpdateLoop(ecs);
+	function bigDeg(deg: number) {
+		if (deg < 0) return 360 + deg;
+		return deg;
+	}
 
-	console.log({ player });
+	function test(currentDir: Point2D, nextDir: Point2D, expected: string) {
+		const delta = nextDir.angleDeg() - currentDir.angleDeg();
+
+		return console.log(
+			`${nextDir.angleDeg()} - ${currentDir.angleDeg()} = ${delta}  |  ${delta > 0 ? "right" : "left"}  e:${expected}`,
+		);
+	}
+
+	test(Direction.UP, Direction.LEFT, "LEFT");
+	test(Direction.UP, Direction.RIGHT, "RIGHT");
 });

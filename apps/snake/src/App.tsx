@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useRef } from "react";
 import type { Example, ExampleContext } from "./util/Example";
-import { signal } from "@sgty/sigma";
 import { ECS } from "@snaekit/ecs";
+import { localStorageSignal } from "./examples/impl/util/localStorageSignal";
 
 const examples = import.meta.glob("./examples/*", { eager: true });
 const examplesCode = import.meta.glob("./examples/*", { eager: true, query: '?raw' });
 const exampleEntries = Object.entries(examples);
 const exampleCodeEntries = Object.entries(examplesCode);
 
-const exampleIndex$ = signal(0);
+const exampleIndex$ = localStorageSignal('exampleIndex', 0);
+
 
 function overflowN(value: number, min: number, max: number) {
 	if (value >= max) {
