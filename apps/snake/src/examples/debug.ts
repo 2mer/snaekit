@@ -49,7 +49,7 @@ export default Example(({ root, ecs, onGameOver }) => {
 
 	document.addEventListener("keydown", handleKeys);
 
-	window.$debug = {
+	(window as any).$debug = {
 		player,
 		apple,
 		grow,
@@ -57,7 +57,7 @@ export default Example(({ root, ecs, onGameOver }) => {
 	};
 
 	ecs.events.once("destroy", () => {
-		window.$debug = undefined;
+		(window as any).$debug = undefined;
 		document.removeEventListener("keydown", handleKeys);
 	});
 });

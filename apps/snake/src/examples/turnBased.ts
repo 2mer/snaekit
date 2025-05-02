@@ -10,12 +10,12 @@ export default Example(({ root, ecs, onGameOver }) => {
 		turnBased: true,
 	});
 
-	const player = createSimpleSnake({
+	createSimpleSnake({
 		ecs,
 		color: "red",
 		onHarm: onGameOver,
 		layer: renderer.createLayer(),
 	});
 
-	const apple = createApple({ ecs, world, worldSize });
+	createApple({ ecs, world, worldSize });
 });

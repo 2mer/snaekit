@@ -1,4 +1,4 @@
-import { Collider, Collision, Growing, Gut, type World } from "@snaekit/core";
+import { Collider, Collision, Gut, type World } from "@snaekit/core";
 import type { ECS } from "@snaekit/ecs";
 import { Position2D, DomRenderable } from "@snaekit/render-dom";
 import { randomFreePosition } from "../game/randomFreePosition";
