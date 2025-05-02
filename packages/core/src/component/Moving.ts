@@ -5,10 +5,7 @@ export class Moving<T extends GenericPoint<T>> extends Component {
 	enabled = true;
 	sleep = 0;
 
-	constructor(
-		public direction: T,
-		public onMoveStopped?: () => void,
-	) {
+	constructor(public direction: T) {
 		super();
 	}
 }

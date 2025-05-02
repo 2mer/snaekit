@@ -1,31 +1,13 @@
-import { Growing, Movement, Slither } from "@snaekit/core";
-import { DomRenderable, DomRenderer } from "@snaekit/render-dom";
 import { Example } from "../util/Example";
-import { createWalledWorld } from "./impl/world/createWalledWorld";
-import { createSimpleController } from "./impl/game/createSimpleController";
 import { createApple } from "./impl/foods/apple";
 import { createSimpleSnake } from "./impl/snakes/simple/createSimpleSnake";
-import { useUpdateLoop } from "./impl/game/useUpdateLoop";
+import { createSimpleSetup } from "./impl/game/createSimpleSetup";
 
 export default Example(({ root, ecs, onGameOver }) => {
-	const CELL_SIZE = 50;
-	const WORLD_SIZE = 10;
-
-	root.style.setProperty("--cell-size", `${CELL_SIZE}px`);
-	root.style.setProperty("--world-size", String(WORLD_SIZE));
-	root.classList.add("world");
-
-	const controller = ecs.addSystem(createSimpleController({}));
-	const slither = ecs.addSystem(new Slither());
-	const movement = ecs.addSystem(new Movement());
-	const growing = ecs.addSystem(new Growing());
-	const world = ecs.addSystem(
-		createWalledWorld({
-			ecs,
-			worldSize: WORLD_SIZE,
-		}),
-	);
-	const renderer = ecs.addSystem(new DomRenderer(root));
+	const { renderer, world, worldSize } = createSimpleSetup({
+		ecs,
+		root,
+	});
 
 	const player = createSimpleSnake({
 		ecs,
@@ -34,7 +16,5 @@ export default Example(({ root, ecs, onGameOver }) => {
 		layer: renderer.createLayer(),
 	});
 
-	const apple = createApple({ ecs, world, worldSize: WORLD_SIZE });
-
-	useUpdateLoop(ecs);
+	const apple = createApple({ ecs, world, worldSize });
 });

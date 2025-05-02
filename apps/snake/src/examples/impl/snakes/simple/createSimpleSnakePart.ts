@@ -1,4 +1,4 @@
-import { vec2 } from "@sgty/point";
+import type { Point2D } from "@sgty/point";
 import { Moving, Collider, Snake } from "@snaekit/core";
 import type { ECS, Entity } from "@snaekit/ecs";
 import { Position2D, DomRenderable } from "@snaekit/render-dom";
@@ -9,6 +9,7 @@ export function createSimpleSnakePart(ecs: ECS, entity: Entity) {
 	const snake = entity.$(Snake);
 	const tail = snake.getTailEntity();
 	const tailPosition = tail.$(Position2D).position;
+	const tailDirection = tail.$(Moving<Point2D>).direction;
 	const renderable = entity.$(DomRenderable);
 
 	const part = ecs.addEntity(
@@ -17,7 +18,7 @@ export function createSimpleSnakePart(ecs: ECS, entity: Entity) {
 			.cls("tile")
 			.styled({ "--bg-color": "orange" })
 			.layer(renderable._layer!),
-		new Moving(vec2()),
+		new Moving(tailDirection.clone()),
 		new Collider({
 			onCollide(entity) {
 				tryHarmEntity({ target: entity, attacker: part });

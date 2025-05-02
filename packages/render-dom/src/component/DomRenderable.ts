@@ -9,7 +9,7 @@ export class DomRenderable extends Component {
 		super();
 	}
 
-	styled(styles: Partial<CSSStyleDeclaration>) {
+	styled(styles: Partial<CSSStyleDeclaration> & { [key: string]: string }) {
 		Object.entries(styles).forEach(([k, v]) => {
 			if (!v) {
 				this.element.style.setProperty(k, null);

@@ -1,8 +1,7 @@
 import type { GenericPoint } from "@sgty/point";
 import { Component, type Entity } from "@snaekit/ecs";
 import { Moving } from "./Moving";
-import type { Movement } from "../system/Movement";
-import { Growing } from "../system/Growing";
+import type { Collision } from "../system/Collision";
 
 class Node extends Component {
 	/**
@@ -29,24 +28,21 @@ export class Snake<T extends GenericPoint<T>> extends Component {
 	}
 
 	grow(entity: Entity) {
-		const growing = this.entity.ecs.getSystem(Growing)!;
 		const newNode = new Snake.Node();
 		entity.components.add(new Snake.Tail(), newNode);
 
-		growing.effects.once(() => {
-			if (this.parts.length) {
-				const tail = this.getTailEntity();
-				tail.components.delete(Snake.Tail);
-				const node = tail.$(Snake.Node);
+		if (this.parts.length) {
+			const tail = this.getTailEntity();
+			tail.components.delete(Snake.Tail);
+			const node = tail.$(Snake.Node);
 
-				node.next = newNode;
-				newNode.prev = node;
+			node.next = newNode;
+			newNode.prev = node;
 
-				node.onChanged();
-			}
+			node.onChanged();
+		}
 
-			this.parts.push(entity);
-		});
+		this.parts.push(entity);
 	}
 
 	getTailEntity() {
@@ -63,12 +59,12 @@ export class Snake<T extends GenericPoint<T>> extends Component {
 		return prevDirection;
 	}
 
-	propagateMotion(movementSystem: Movement<T>, direction: T) {
-		const collisions = movementSystem.getEntityCollisions(
+	propagateMotion(collisionSystem: Collision<T>, direction: T) {
+		const collisions = collisionSystem.getEntityCollisions(
 			this.entity,
 			direction,
 		);
-		const canMove = movementSystem.canEntityMove(
+		const canMove = collisionSystem.canEntityMove(
 			this.entity,
 			direction,
 			collisions,
@@ -77,7 +73,7 @@ export class Snake<T extends GenericPoint<T>> extends Component {
 		this.setMovingEnabled(canMove);
 
 		if (!canMove) {
-			movementSystem.handleEntityCollisions(this.entity, direction, collisions);
+			// collisionSystem.handleEntityCollisions(this.entity, direction, collisions);
 			return;
 		}
 

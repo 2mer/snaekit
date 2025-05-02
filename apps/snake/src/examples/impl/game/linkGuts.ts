@@ -1,22 +1,25 @@
-import { type Edible, Gut } from "@snaekit/core";
+import { Gut } from "@snaekit/core";
 import type { Entity } from "@snaekit/ecs";
 
 export function linkGuts(gutLinkedEntities: Entity[]) {
 	let gutLocked = false;
-	function sharedGutLogic(this: Gut, edible: Edible) {
-		if (gutLocked) return;
 
-		const entitiesToFeed = gutLinkedEntities.filter((e) => e !== this.entity);
+	const createGutLogic = (baseLogic: (this: Gut, edible: Entity) => void) =>
+		function sharedGutLogic(this: Gut, edible: Entity) {
+			baseLogic.call(this, edible);
+			if (gutLocked) return;
 
-		gutLocked = true;
-		entitiesToFeed.forEach((e) => {
-			edible.tryFeed(e);
-		});
-		gutLocked = false;
-	}
+			const entitiesToFeed = gutLinkedEntities.filter((e) => e !== this.entity);
+
+			gutLocked = true;
+			entitiesToFeed.forEach((e) => {
+				e.$(Gut).onEat(edible);
+			});
+			gutLocked = false;
+		};
 
 	gutLinkedEntities.forEach((e) => {
-		// e.components.delete(Gut);
-		e.$(Gut).onEat = sharedGutLogic;
+		const baseLogic = e.$(Gut).onEat;
+		e.$(Gut).onEat = createGutLogic(baseLogic);
 	});
 }

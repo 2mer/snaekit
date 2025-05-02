@@ -1,5 +1,5 @@
 import type { Point2D } from "@sgty/point";
-import { Collider, Moving, World } from "@snaekit/core";
+import { Collider, Movement, Moving, World } from "@snaekit/core";
 import type { ECS } from "@snaekit/ecs";
 import { Position2D } from "@snaekit/render-dom";
 import { OOBFallbackMatrix } from "./OOBFallbackMatrix";
@@ -45,16 +45,17 @@ export function createLoopedWorld({
 					collider?.options?.onCollide?.(entity, direction);
 				});
 
-				if (
-					ents.every((e) => {
-						const collider = e.$(Collider);
-						return !collider?.options?.isSolid?.(entity, direction);
-					})
-				) {
+				const canTp = ents.every((e) => {
+					const collider = e.$(Collider);
+					return !collider?.options?.isSolid?.(entity, direction);
+				});
+				if (canTp) {
 					moving$.sleep = 1;
 
-					position$.position.set(newPos);
-					position$.onChanged();
+					ecs.getSystem(Movement)!.effects.once(() => {
+						position$.position.set(newPos);
+						position$.onChanged();
+					});
 				}
 			},
 		}),

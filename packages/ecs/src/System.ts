@@ -1,6 +1,6 @@
 import type { ComponentClass } from "./Component";
 import type { ECS } from "./ECS";
-import type { Effect } from "./Effects";
+import { Effects, type Effect } from "./Effects";
 import type { Entity } from "./Entity";
 import { EntityEffects } from "./EntityEffects";
 
@@ -9,6 +9,7 @@ export type SystemClass = new (...args: any) => System;
 export abstract class System {
 	public entities = new Set<Entity>();
 	private entityEffects = new EntityEffects();
+	public effects = new Effects<number>();
 	/**
 	 * Set of Component classes, ALL of which are required before the
 	 * system is run on an entity.
@@ -19,6 +20,8 @@ export abstract class System {
 
 	public update(delta: number) {
 		this.entityEffects.run();
+
+		this.effects.run(delta);
 	}
 
 	public onEntityAdded(entity: Entity) {

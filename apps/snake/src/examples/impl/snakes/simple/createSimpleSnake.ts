@@ -1,18 +1,12 @@
 import { type Point2D, vec2 } from "@sgty/point";
-import {
-	Moving,
-	WishDir,
-	Snake,
-	Controlled,
-	Collider,
-	Gut,
-} from "@snaekit/core";
+import { Moving, WishDir, Snake, Controlled, Collider } from "@snaekit/core";
 import type { ECS, Entity } from "@snaekit/ecs";
 import { Position2D, DomRenderable } from "@snaekit/render-dom";
 import { ignoreBackwardDirection } from "../../game/createSimpleController";
 import { Sensitive } from "../../component/Sensitive";
 import { tryHarmEntity } from "../../game/tryHarmEntity";
 import { createSimpleSnakePartDom } from "./createSimpleSnakePartDom";
+import { simpleGut } from "./simpleGut";
 
 export function createSimpleSnake({
 	ecs,
@@ -47,7 +41,7 @@ export function createSimpleSnake({
 				return entity.components.has(Snake);
 			},
 		}),
-		new Gut(),
+		simpleGut(),
 	);
 
 	player.name = "Player";

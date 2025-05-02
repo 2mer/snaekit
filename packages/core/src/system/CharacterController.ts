@@ -9,12 +9,6 @@ export class CharacterController<T extends GenericPoint<T>> extends System {
 		WishDir<T>,
 	]);
 
-	effects = new Effects();
-
-	update(): void {
-		this.effects.run();
-	}
-
 	setMoveDirection(direction: T) {
 		this.effects.once(() => {
 			for (const entity of this.entities) {

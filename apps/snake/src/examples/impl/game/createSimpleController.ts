@@ -8,8 +8,9 @@ export function createSimpleController(options: ControllerOptions) {
 	const controller = new CharacterController();
 
 	function handleMoveInDirection(direction: Point2D) {
-		return () => {
+		return (e: any) => {
 			controller.setMoveDirection(direction);
+			e.preventDefault();
 			if ("turnBased" in options) {
 				options.update();
 			}
@@ -26,12 +27,12 @@ export function createSimpleController(options: ControllerOptions) {
 		ArrowDown: handleMoveInDirection(Direction.DOWN),
 		ArrowRight: handleMoveInDirection(Direction.RIGHT),
 		ArrowUp: handleMoveInDirection(Direction.UP),
-	} as Record<string, () => void>;
+	} as Record<string, (e: any) => void>;
 
 	document.addEventListener("keydown", (e) => {
 		const handler = keyHandlers[e.key];
 
-		handler?.();
+		handler?.(e);
 	});
 
 	return controller;

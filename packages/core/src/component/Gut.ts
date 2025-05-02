@@ -1,8 +1,7 @@
-import { Component } from "@snaekit/ecs";
-import type { Edible } from "./Edible";
+import { Component, type Entity } from "@snaekit/ecs";
 
 export class Gut extends Component {
-	public constructor(public onEat: (edible: Edible) => void = () => {}) {
+	public constructor(public onEat: (entity: Entity) => void = () => {}) {
 		super();
 	}
 }

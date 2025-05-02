@@ -1,14 +1,14 @@
 import { Controlled, Moving, Snake } from "@snaekit/core";
 import { DomRenderer, Position2D } from "@snaekit/render-dom";
 import { Example } from "../util/Example";
-import simple from "./simple";
 import { createSimpleSnake } from "./impl/snakes/simple/createSimpleSnake";
 import { vec2, type Point2D } from "@sgty/point";
 import { ignoreBackwardDirection } from "./impl/game/createSimpleController";
 import { linkGuts } from "./impl/game/linkGuts";
+import turnBased from "./turnBased";
 
 export default Example((ctx) => {
-	simple(ctx);
+	turnBased(ctx);
 
 	const { ecs, onGameOver } = ctx;
 

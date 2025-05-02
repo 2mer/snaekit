@@ -1,10 +1,9 @@
-import { Collider, Edible, Snake, type World } from "@snaekit/core";
+import { Collider, Collision, Growing, Gut, type World } from "@snaekit/core";
 import type { ECS } from "@snaekit/ecs";
 import { Position2D, DomRenderable } from "@snaekit/render-dom";
 import { randomFreePosition } from "../game/randomFreePosition";
 import { False } from "../util/Boolean";
 import type { Point2D } from "@sgty/point";
-import { createSimpleSnakePart } from "../snakes/simple/createSimpleSnakePart";
 
 export function createApple({
 	ecs,
@@ -18,20 +17,19 @@ export function createApple({
 			.styled({ "--bg-color": "green", zIndex: "10" }),
 		new Collider({
 			onCollide(entity) {
-				apple.$(Edible).tryFeed(entity);
+				if (entity.components.has(Gut)) {
+					ecs.getSystem(Collision)!.effects.once(() => {
+						const gut = entity.$(Gut);
+
+						gut.onEat(entity);
+
+						const myPos = apple.$(Position2D);
+						myPos.position.set(randomFreePosition(world, 0, worldSize));
+						myPos.onChanged();
+					});
+				}
 			},
 			isSolid: False,
-		}),
-		new Edible((diner) => {
-			if (diner.components.has(Snake)) {
-				const snake = diner.$(Snake);
-
-				snake.grow(createSimpleSnakePart(ecs, diner));
-
-				const myPos = apple.$(Position2D);
-				myPos.position.set(randomFreePosition(world, 0, worldSize));
-				myPos.onChanged();
-			}
 		}),
 	);
 
