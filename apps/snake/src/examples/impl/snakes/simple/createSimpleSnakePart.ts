@@ -3,6 +3,7 @@ import { Moving, Collider, Snake } from "@snaekit/core";
 import type { ECS, Entity } from "@snaekit/ecs";
 import { Position2D, DomRenderable } from "@snaekit/render-dom";
 import { tryHarmEntity } from "../../game/tryHarmEntity";
+import { createSimpleSnakePartDom } from "./createSimpleSnakePartDom";
 
 export function createSimpleSnakePart(ecs: ECS, entity: Entity) {
 	const snake = entity.$(Snake);
@@ -12,9 +13,9 @@ export function createSimpleSnakePart(ecs: ECS, entity: Entity) {
 
 	const part = ecs.addEntity(
 		new Position2D(tailPosition.clone()),
-		new DomRenderable()
+		new DomRenderable(createSimpleSnakePartDom())
 			.cls("tile")
-			.styled({ backgroundColor: "orange", zIndex: "10" })
+			.styled({ "--bg-color": "orange" })
 			.layer(renderable._layer!),
 		new Moving(vec2()),
 		new Collider({

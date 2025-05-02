@@ -27,6 +27,7 @@ function App() {
 	const gameRef = useRef<HTMLDivElement>(null);
 	const exampleIndex = exampleIndex$.use();
 
+
 	const currentExample = useMemo(() => {
 		const [exPath, exMod] = exampleEntries[exampleIndex];
 		const [, codeMod] = exampleCodeEntries[exampleIndex];

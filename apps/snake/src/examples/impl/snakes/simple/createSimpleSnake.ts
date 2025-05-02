@@ -1,9 +1,18 @@
 import { type Point2D, vec2 } from "@sgty/point";
-import { Moving, WishDir, Snake, Controlled } from "@snaekit/core";
+import {
+	Moving,
+	WishDir,
+	Snake,
+	Controlled,
+	Collider,
+	Gut,
+} from "@snaekit/core";
 import type { ECS, Entity } from "@snaekit/ecs";
 import { Position2D, DomRenderable } from "@snaekit/render-dom";
 import { ignoreBackwardDirection } from "../../game/createSimpleController";
 import { Sensitive } from "../../component/Sensitive";
+import { tryHarmEntity } from "../../game/tryHarmEntity";
+import { createSimpleSnakePartDom } from "./createSimpleSnakePartDom";
 
 export function createSimpleSnake({
 	ecs,
@@ -18,9 +27,9 @@ export function createSimpleSnake({
 }) {
 	const player = ecs.addEntity(
 		new Position2D(vec2(0, 0)),
-		new DomRenderable()
+		new DomRenderable(createSimpleSnakePartDom())
 			.cls("tile", "head")
-			.styled({ backgroundColor: color, zIndex: "10" })
+			.styled({ "--bg-color": color })
 			.layer(layer),
 		new Moving(vec2()),
 		new WishDir(vec2()),
@@ -30,7 +39,18 @@ export function createSimpleSnake({
 			const moving = player.$(Moving<Point2D>);
 			return ignoreBackwardDirection(input, moving.direction);
 		}),
+		new Collider({
+			onCollide(entity) {
+				tryHarmEntity({ target: entity, attacker: player });
+			},
+			isSolid(entity) {
+				return entity.components.has(Snake);
+			},
+		}),
+		new Gut(),
 	);
+
+	player.name = "Player";
 
 	return player;
 }

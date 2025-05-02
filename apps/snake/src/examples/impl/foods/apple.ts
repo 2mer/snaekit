@@ -1,4 +1,4 @@
-import { Collider, Snake, type World } from "@snaekit/core";
+import { Collider, Edible, Snake, type World } from "@snaekit/core";
 import type { ECS } from "@snaekit/ecs";
 import { Position2D, DomRenderable } from "@snaekit/render-dom";
 import { randomFreePosition } from "../game/randomFreePosition";
@@ -15,22 +15,27 @@ export function createApple({
 		new Position2D(randomFreePosition(world, 0, worldSize)),
 		new DomRenderable()
 			.cls("tile", "apple")
-			.styled({ backgroundColor: "green", zIndex: "10" }),
+			.styled({ "--bg-color": "green", zIndex: "10" }),
 		new Collider({
 			onCollide(entity) {
-				if (entity.components.has(Snake)) {
-					const snake = entity.$(Snake);
-
-					snake.grow(createSimpleSnakePart(ecs, entity));
-
-					const myPos = apple.$(Position2D);
-					myPos.position.set(randomFreePosition(world, 0, worldSize));
-					myPos.onChanged();
-				}
+				apple.$(Edible).tryFeed(entity);
 			},
 			isSolid: False,
 		}),
+		new Edible((diner) => {
+			if (diner.components.has(Snake)) {
+				const snake = diner.$(Snake);
+
+				snake.grow(createSimpleSnakePart(ecs, diner));
+
+				const myPos = apple.$(Position2D);
+				myPos.position.set(randomFreePosition(world, 0, worldSize));
+				myPos.onChanged();
+			}
+		}),
 	);
+
+	apple.name = "Apple";
 
 	return apple;
 }

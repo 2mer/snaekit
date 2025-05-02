@@ -2,6 +2,7 @@ import type { GenericPoint } from "@sgty/point";
 import { Component, type Entity } from "@snaekit/ecs";
 import { Moving } from "./Moving";
 import type { Movement } from "../system/Movement";
+import { Growing } from "../system/Growing";
 
 class Node extends Component {
 	/**
@@ -28,21 +29,24 @@ export class Snake<T extends GenericPoint<T>> extends Component {
 	}
 
 	grow(entity: Entity) {
+		const growing = this.entity.ecs.getSystem(Growing)!;
 		const newNode = new Snake.Node();
-
-		if (this.parts.length) {
-			const tail = this.getTailEntity();
-			tail.components.delete(Snake.Tail);
-			const node = tail.$(Snake.Node);
-
-			node.next = newNode;
-			newNode.prev = node;
-
-			node.onChanged();
-		}
-
 		entity.components.add(new Snake.Tail(), newNode);
-		this.parts.push(entity);
+
+		growing.effects.once(() => {
+			if (this.parts.length) {
+				const tail = this.getTailEntity();
+				tail.components.delete(Snake.Tail);
+				const node = tail.$(Snake.Node);
+
+				node.next = newNode;
+				newNode.prev = node;
+
+				node.onChanged();
+			}
+
+			this.parts.push(entity);
+		});
 	}
 
 	getTailEntity() {

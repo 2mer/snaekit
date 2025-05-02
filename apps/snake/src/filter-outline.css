@@ -1,0 +1,7 @@
+.layer {
+	filter: drop-shadow(2px 2px 0px black) drop-shadow(-2px -2px 0px black) drop-shadow(-2px 2px 0px black) drop-shadow(2px -2px 0px black);
+
+	&&.negative {
+		filter: invert(1) drop-shadow(2px 2px 0px black) drop-shadow(-2px -2px 0px black) drop-shadow(-2px 2px 0px black) drop-shadow(2px -2px 0px black);
+	}
+}

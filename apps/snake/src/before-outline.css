@@ -1,0 +1,17 @@
+.tile {
+	background: black !important;
+	box-shadow: 0 0 0 4px black;
+
+	&::before {
+		@apply absolute w-full h-full;
+
+		content: '';
+		border: inherit;
+		border-radius: inherit;
+
+		/* width: calc(100% - 4px);
+		height: calc(100% - 4px); */
+
+		background: var(--bg-color);
+	}
+}

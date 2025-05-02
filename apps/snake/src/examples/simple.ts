@@ -1,4 +1,4 @@
-import { Movement, Slither } from "@snaekit/core";
+import { Growing, Movement, Slither } from "@snaekit/core";
 import { DomRenderable, DomRenderer } from "@snaekit/render-dom";
 import { Example } from "../util/Example";
 import { createWalledWorld } from "./impl/world/createWalledWorld";
@@ -18,6 +18,7 @@ export default Example(({ root, ecs, onGameOver }) => {
 	const controller = ecs.addSystem(createSimpleController({}));
 	const slither = ecs.addSystem(new Slither());
 	const movement = ecs.addSystem(new Movement());
+	const growing = ecs.addSystem(new Growing());
 	const world = ecs.addSystem(
 		createWalledWorld({
 			ecs,

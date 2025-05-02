@@ -1,0 +1,18 @@
+@keyframes tileIn {
+	0% {
+		transform: scale(0);
+	}
+
+	100% {
+		transform: scale(1);
+	}
+}
+
+.tile :is(.content, .shadow) {
+	transition: all 200ms;
+	animation: tileIn 200ms;
+
+	&::after {
+		transition: all 200ms;
+	}
+}

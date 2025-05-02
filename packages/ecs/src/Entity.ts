@@ -12,6 +12,7 @@ export type EntityEvents = {
 export class Entity {
 	components: ComponentContainer;
 	events = new EventEmitter<EntityEvents>();
+	name?: string;
 
 	constructor(
 		public readonly id: string,
